@@ -27,10 +27,10 @@ VAL = 'val'
 
 
 # save some samples to visualize the training progress
-def get_fixed_samples(ds, num):
+def get_fixed_samples(ds, num, gpu=True):
     dl = td.DataLoader(ds, batch_size=num, shuffle=False, num_workers=0)
     data = next(iter(dl))
-    return Batch(data, n=num)
+    return Batch(data, n=num, gpu=gpu)
 
 
 def weights_init(m):
@@ -77,14 +77,14 @@ class Training(object):
             log.info("Resuming session {} from snapshot {}...".format(self.session_name, snapshot))
             self._load_snapshot(snapshot)
 
-        self.net = self.net.cuda()
+        # self.net = self.net.cuda()
 
         log.info("Total model params: {:,}".format(count_parameters(self.net)))
 
         n_fixed_images = 10
         self.fixed_batch = {}
         for phase in datasets.keys():
-            self.fixed_batch[phase] = get_fixed_samples(datasets[phase], n_fixed_images)
+            self.fixed_batch[phase] = get_fixed_samples(datasets[phase], n_fixed_images, gpu=self.args.gpu)
 
     def _get_network(self, pretrained):
         raise NotImplementedError

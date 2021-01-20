@@ -57,8 +57,10 @@ class VesselTraining(training.Training):
         #                                                             factor=0.25, min_lr=0.000025)
 
     def _get_network(self, pretrained):
-        # return unet.UNet(n_channels=3, n_classes=1).cuda()
-        return vlight.VLight(n_channels=3, n_classes=1).cuda()
+        net = vlight.VLight(n_channels=3, n_classes=1)
+        if self.args.gpu:
+            net = net.cuda()
+        return net
 
     def _print_iter_stats(self, stats):
         means = pd.DataFrame(stats).mean().to_dict()
@@ -203,7 +205,7 @@ class VesselTraining(training.Training):
         time_proc_start = time.time()
         iter_stats = {'time_dataloading': time_dataloading}
 
-        batch = Batch(data, eval=eval, gpu=True)
+        batch = Batch(data, eval=eval, gpu=self.args.gpu)
 
         targets = batch.masks.float()
         images = batch.images
@@ -353,6 +355,7 @@ if __name__ == '__main__':
     parser.add_argument('--n-dataset-repeats', default=100, type=int, help='upscale numper of datapoints')
     parser.add_argument('--dataset-train', default=['drive'], type=str, nargs='+', help='dataset(s) for training.')
     parser.add_argument('--dataset-val', default=['drive'], type=str, nargs='+', help='dataset(s) for training.')
+    parser.add_argument('--gpu', default=True, type=bool_str, help='use GPU')
     args = parser.parse_known_args()[0]
 
     # args.wait = 0

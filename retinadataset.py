@@ -3,16 +3,13 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-import skimage
+import skimage.io
 import torchvision.datasets as tdv
 import torch.utils.data as td
 import albumentations as alb
-from albumentations.pytorch import transforms as alb_torch
-
-from csl_common.datasets import imagedataset
-
 
 batch_crop_size = 512
+
 
 class RepeatDataset(td.Dataset):
     """
@@ -47,13 +44,6 @@ class Subset(td.Subset):
         str = self.dataset.__str__()
         str += f'\nSubset indices: {self.indices}'
         return str
-
-
-class RetinaDataset(imagedataset.ImageDataset):
-
-    def __init__(self, root, fullsize_img_dir, image_size, level=0, **kwargs):
-        self.level = level
-        super().__init__(root, fullsize_img_dir, image_size, **kwargs)
 
 
 class DRIVE(tdv.VisionDataset):
